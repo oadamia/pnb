@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/kelseyhightower/envconfig"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	var config Config
+	err := envconfig.Process("pnb", &config)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(config.OpenAIAPIKey)
 }
