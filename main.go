@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kelseyhightower/envconfig"
@@ -12,11 +13,12 @@ type Config struct {
 }
 
 func main() {
+	slog.Info("Starting up...")
+
 	var config Config
 	err := envconfig.Process("pnb", &config)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println(config.OpenAIKey)
 }
