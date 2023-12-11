@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password  # Replace with your desired password
+      POSTGRES_DB: pnb          # Optional: Specify a database to be created
+      POSTGRES_USER: admin      # Optional: Specify a user to be created
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+
+# Uncomment the following lines if your Go application's Docker setup is ready
+#  app:
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres

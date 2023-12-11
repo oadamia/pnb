@@ -15,8 +15,8 @@ type Config struct {
 func main() {
 	slog.Info("Starting up...")
 
-	var config Config
-	err := envconfig.Process("pnb", &config)
+	var cfg Config
+	err := envconfig.Process("pnb", &cfg)
 	if err != nil {
 		fmt.Println(err)
 	}
