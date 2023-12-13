@@ -20,17 +20,20 @@ func main() {
 		fmt.Println(err)
 	}
 
+	slog.Info("Connecting to database...")
 	db, err := sql.Open("pgx", cfg.ConnString())
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer db.Close()
 
+	slog.Info("Pinging database...")
 	err = db.Ping()
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	slog.Info("Running migrations...")
 	err = goose.Up(db, cfg.DBMigration)
 	if err != nil {
 		fmt.Println(err)
