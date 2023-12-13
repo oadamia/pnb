@@ -3,38 +3,12 @@
 //   sqlc v1.24.0
 // source: sources.sql
 
-package store
+package db
 
 import (
 	"context"
 	"time"
 )
-
-const createSource = `-- name: CreateSource :one
-INSERT INTO sources (name, url, driver) 
-VALUES ($1, $2, $3)
-RETURNING id, name, url, driver, created_at, updated_at
-`
-
-type CreateSourceParams struct {
-	Name   string
-	Url    string
-	Driver string
-}
-
-func (q *Queries) CreateSource(ctx context.Context, arg CreateSourceParams) (Source, error) {
-	row := q.db.QueryRowContext(ctx, createSource, arg.Name, arg.Url, arg.Driver)
-	var i Source
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Url,
-		&i.Driver,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
 
 const deleteSource = `-- name: DeleteSource :one
 DELETE FROM 
@@ -57,14 +31,20 @@ func (q *Queries) DeleteSource(ctx context.Context, id int32) (Source, error) {
 	return i, err
 }
 
-const getSource = `-- name: GetSource :one
-SELECT id, name, url, driver, created_at, updated_at 
-FROM sources 
-WHERE id = $1
+const insertSource = `-- name: InsertSource :one
+INSERT INTO sources (name, url, driver) 
+VALUES ($1, $2, $3)
+RETURNING id, name, url, driver, created_at, updated_at
 `
 
-func (q *Queries) GetSource(ctx context.Context, id int32) (Source, error) {
-	row := q.db.QueryRowContext(ctx, getSource, id)
+type InsertSourceParams struct {
+	Name   string
+	Url    string
+	Driver string
+}
+
+func (q *Queries) InsertSource(ctx context.Context, arg InsertSourceParams) (Source, error) {
+	row := q.db.QueryRowContext(ctx, insertSource, arg.Name, arg.Url, arg.Driver)
 	var i Source
 	err := row.Scan(
 		&i.ID,
@@ -77,13 +57,13 @@ func (q *Queries) GetSource(ctx context.Context, id int32) (Source, error) {
 	return i, err
 }
 
-const selectSources = `-- name: SelectSources :many
+const listSources = `-- name: ListSources :many
 SELECT id, name, url, driver, created_at, updated_at 
 FROM sources
 `
 
-func (q *Queries) SelectSources(ctx context.Context) ([]Source, error) {
-	rows, err := q.db.QueryContext(ctx, selectSources)
+func (q *Queries) ListSources(ctx context.Context) ([]Source, error) {
+	rows, err := q.db.QueryContext(ctx, listSources)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +90,26 @@ func (q *Queries) SelectSources(ctx context.Context) ([]Source, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const selectSource = `-- name: SelectSource :one
+SELECT id, name, url, driver, created_at, updated_at 
+FROM sources 
+WHERE id = $1
+`
+
+func (q *Queries) SelectSource(ctx context.Context, id int32) (Source, error) {
+	row := q.db.QueryRowContext(ctx, selectSource, id)
+	var i Source
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.Driver,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const updateSource = `-- name: UpdateSource :one

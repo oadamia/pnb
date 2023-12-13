@@ -2,11 +2,17 @@
 // versions:
 //   sqlc v1.24.0
 
-package store
+package db
 
 import (
 	"time"
 )
+
+type Health struct {
+	Message   string
+	Service   string
+	CreatedAt time.Time
+}
 
 type Source struct {
 	ID        int32

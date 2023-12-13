@@ -1,9 +1,9 @@
 version: 2
 sql:
-- schema: sqldb/migrations
-  queries: sqldb/queries
+- schema: service/migrations
+  queries: service/queries
   engine: postgresql
   gen:
     go: 
-      package: store
-      out: sqldb/store
+      package: db
+      out: service/db

@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"pnb/collector"
-	"pnb/sqldb/store"
+	"pnb/api"
+	"pnb/service"
+	"pnb/service/db"
+	"pnb/worker"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
@@ -24,32 +26,34 @@ func main() {
 	}
 
 	slog.Info("Connecting to database...")
-	db, err := sql.Open("pgx", cfg.ConnString())
+	pool, err := sql.Open("pgx", cfg.ConnString())
 	if err != nil {
 		slog.Error("Failed to connect to database", err)
 	}
-	defer db.Close()
+	defer pool.Close()
 
 	slog.Info("Pinging database...")
-	err = db.Ping()
+	err = pool.Ping()
 	if err != nil {
 		slog.Error("Failed to ping database", err)
 	}
 
 	slog.Info("Running migrations...")
-	err = goose.Up(db, cfg.DBMigration)
+	err = goose.Up(pool, cfg.DBMigration)
 	if err != nil {
 		slog.Error("Failed to run migrations", err)
 	}
 
 	slog.Info("Creating store...")
-	st := store.New(db)
+	db := db.New(pool)
 
 	slog.Info("Starting collector...")
-	collectorService := collector.New(st)
-	collectorService.Start()
+	service := service.New(db)
+	worker := worker.New(service)
+	worker.Start()
 
 	e := echo.New()
+	api.RegisterRoutes(e, service)
 
 	Start(e, cfg.Port)
 }

@@ -1,13 +1,13 @@
--- name: CreateSource :one
+-- name: InsertSource :one
 INSERT INTO sources (name, url, driver) 
 VALUES ($1, $2, $3)
 RETURNING *;
 
--- name: SelectSources :many
+-- name: ListSources :many
 SELECT * 
 FROM sources;
 
--- name: GetSource :one
+-- name: SelectSource :one
 SELECT * 
 FROM sources 
 WHERE id = $1;
