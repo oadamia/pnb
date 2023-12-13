@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"os"
+	"os/signal"
 	"pnb/api"
 	"pnb/service"
 	"pnb/service/db"
 	"pnb/worker"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
@@ -56,6 +60,29 @@ func main() {
 	api.RegisterRoutes(e, service)
 
 	Start(e, cfg.Port)
+}
+
+func Start(e *echo.Echo, port string) {
+	if e != nil {
+		go func() {
+			if err := e.Start(port); err != nil {
+				slog.Error("shutting down the server: ", err)
+			}
+		}()
+	} else {
+		panic("Start. echo does not exist")
+	}
+	slog.Info("Started On ", "Port :", port)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	slog.Info("Shutting down server...")
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
 
 type Config struct {
