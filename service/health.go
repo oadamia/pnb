@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log/slog"
 	"pnb/service/db"
 	"time"
 )
@@ -22,12 +21,9 @@ func (s Service) HealthCheck(ctx context.Context) (*Health, error) {
 
 	dbhealth, err := s.db.InsertHealth(ctx, params)
 	if err != nil {
-		dbhealth.Message = err.Error()
 		return nil, err
 	}
 
-	health := HealthFrom(dbhealth)
-	slog.Info("HealthCheck", "health", health)
 	return HealthFrom(dbhealth), nil
 }
 
