@@ -12,8 +12,11 @@ type Service struct {
 
 // Database store interface
 type Database interface {
-	ListSources(ctx context.Context) ([]db.Source, error)
+	GetSource(ctx context.Context, id int32) (db.Source, error)
+	SelectSources(ctx context.Context) ([]db.Source, error)
 	InsertSource(ctx context.Context, arg db.InsertSourceParams) (db.Source, error)
+	UpdateSource(ctx context.Context, arg db.UpdateSourceParams) (db.Source, error)
+	DeleteSource(ctx context.Context, id int32) (db.Source, error)
 	InsertHealth(ctx context.Context, arg db.InsertHealthParams) (db.Health, error)
 }
 

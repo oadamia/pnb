@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 const deleteSource = `-- name: DeleteSource :one
@@ -19,6 +18,26 @@ RETURNING id, name, url, driver, created_at, updated_at
 
 func (q *Queries) DeleteSource(ctx context.Context, id int32) (Source, error) {
 	row := q.db.QueryRowContext(ctx, deleteSource, id)
+	var i Source
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.Driver,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getSource = `-- name: GetSource :one
+SELECT id, name, url, driver, created_at, updated_at 
+FROM sources 
+WHERE id = $1
+`
+
+func (q *Queries) GetSource(ctx context.Context, id int32) (Source, error) {
+	row := q.db.QueryRowContext(ctx, getSource, id)
 	var i Source
 	err := row.Scan(
 		&i.ID,
@@ -57,13 +76,13 @@ func (q *Queries) InsertSource(ctx context.Context, arg InsertSourceParams) (Sou
 	return i, err
 }
 
-const listSources = `-- name: ListSources :many
+const selectSources = `-- name: SelectSources :many
 SELECT id, name, url, driver, created_at, updated_at 
 FROM sources
 `
 
-func (q *Queries) ListSources(ctx context.Context) ([]Source, error) {
-	rows, err := q.db.QueryContext(ctx, listSources)
+func (q *Queries) SelectSources(ctx context.Context) ([]Source, error) {
+	rows, err := q.db.QueryContext(ctx, selectSources)
 	if err != nil {
 		return nil, err
 	}
@@ -92,43 +111,22 @@ func (q *Queries) ListSources(ctx context.Context) ([]Source, error) {
 	return items, nil
 }
 
-const selectSource = `-- name: SelectSource :one
-SELECT id, name, url, driver, created_at, updated_at 
-FROM sources 
-WHERE id = $1
-`
-
-func (q *Queries) SelectSource(ctx context.Context, id int32) (Source, error) {
-	row := q.db.QueryRowContext(ctx, selectSource, id)
-	var i Source
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Url,
-		&i.Driver,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const updateSource = `-- name: UpdateSource :one
 UPDATE sources 
 SET 
     name = $2, 
     url = $3, 
     driver = $4,
-    created_at = $5
+    updated_at = NOW()
 WHERE id = $1
 RETURNING id, name, url, driver, created_at, updated_at
 `
 
 type UpdateSourceParams struct {
-	ID        int32
-	Name      string
-	Url       string
-	Driver    string
-	CreatedAt time.Time
+	ID     int32
+	Name   string
+	Url    string
+	Driver string
 }
 
 func (q *Queries) UpdateSource(ctx context.Context, arg UpdateSourceParams) (Source, error) {
@@ -137,7 +135,6 @@ func (q *Queries) UpdateSource(ctx context.Context, arg UpdateSourceParams) (Sou
 		arg.Name,
 		arg.Url,
 		arg.Driver,
-		arg.CreatedAt,
 	)
 	var i Source
 	err := row.Scan(

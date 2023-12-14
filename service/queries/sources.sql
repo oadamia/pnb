@@ -3,11 +3,11 @@ INSERT INTO sources (name, url, driver)
 VALUES ($1, $2, $3)
 RETURNING *;
 
--- name: ListSources :many
+-- name: SelectSources :many
 SELECT * 
 FROM sources;
 
--- name: SelectSource :one
+-- name: GetSource :one
 SELECT * 
 FROM sources 
 WHERE id = $1;
@@ -18,7 +18,7 @@ SET
     name = $2, 
     url = $3, 
     driver = $4,
-    created_at = $5
+    updated_at = NOW()
 WHERE id = $1
 RETURNING *;
 
