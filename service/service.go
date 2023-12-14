@@ -13,6 +13,7 @@ type Service struct {
 // Database store interface
 type Database interface {
 	ListSources(ctx context.Context) ([]db.Source, error)
+	InsertSource(ctx context.Context, arg db.InsertSourceParams) (db.Source, error)
 	InsertHealth(ctx context.Context, arg db.InsertHealthParams) (db.Health, error)
 }
 
