@@ -14,7 +14,7 @@ import (
 
 var e *echo.Echo
 
-func InitAPI(s service.Service, port string) {
+func Init(s service.Service, port string) {
 	e = echo.New()
 	addLogger()
 	registerRoutes(s)

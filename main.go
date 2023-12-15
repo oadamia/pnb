@@ -51,7 +51,7 @@ func main() {
 	worker := worker.New(service)
 	worker.Start()
 
-	api.InitAPI(service, cfg.Port)
+	api.Init(service, cfg.Port)
 
 }
 
