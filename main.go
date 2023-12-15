@@ -1,23 +1,17 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"os"
-	"os/signal"
 	"pnb/api"
 	"pnb/service"
 	"pnb/service/db"
 	"pnb/worker"
-	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/pressly/goose/v3"
 )
 
@@ -57,62 +51,8 @@ func main() {
 	worker := worker.New(service)
 	worker.Start()
 
-	e := echo.New()
-	AddLogger(e)
-	api.RegisterRoutes(e, service)
+	api.InitAPI(service, cfg.Port)
 
-	Start(e, cfg.Port)
-}
-
-func Start(e *echo.Echo, port string) {
-	if e != nil {
-		go func() {
-			if err := e.Start(port); err != nil {
-				slog.Error("shutting down the server: ", err)
-			}
-		}()
-	} else {
-		panic("Start. echo does not exist")
-	}
-	slog.Info("Started On ", "Port :", port)
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	slog.Info("Shutting down server...")
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	}
-}
-
-func AddLogger(e *echo.Echo) {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogStatus:   true,
-		LogURI:      true,
-		LogError:    true,
-		LogMethod:   true,
-		HandleError: true, // forwards error to the global error handler, so it can decide appropriate status code
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			if v.Error == nil {
-				logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
-					slog.String("method", v.Method),
-				)
-			} else {
-				logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
-					slog.String("uri", v.URI),
-					slog.Int("status", v.Status),
-					slog.String("method", v.Method),
-					slog.String("err", v.Error.Error()),
-				)
-			}
-			return nil
-		},
-	}))
 }
 
 type Config struct {
