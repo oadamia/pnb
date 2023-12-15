@@ -25,6 +25,7 @@ func main() {
 	slog.Info("Creating service...")
 	service, db, err := service.NewService(cfg)
 	if err != nil {
+		slog.Error("Failed to create service", err)
 		panic(err)
 	}
 	defer db.Close()
