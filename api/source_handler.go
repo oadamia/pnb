@@ -33,7 +33,7 @@ func ListSources(s service.Service) echo.HandlerFunc {
 // CreateSource handler
 func CreateSource(s service.Service) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		req := new(service.CreateSourceReq)
+		req := new(service.CreateSourceParams)
 		err := ctx.Bind(req)
 		if err != nil {
 			return err
@@ -71,7 +71,7 @@ func UpdateSource(s service.Service) echo.HandlerFunc {
 			return err
 		}
 
-		req := new(service.UpdateSourceReq)
+		req := new(service.UpdateSourceParams)
 		err = ctx.Bind(req)
 		if err != nil {
 			return err

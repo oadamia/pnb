@@ -1,4 +1,4 @@
--- name: InsertHealth :one
+-- name: CreateHealth :one
 INSERT INTO health (
     message, 
     service

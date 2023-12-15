@@ -1,28 +1,48 @@
 package service
 
 import (
-	"context"
-	"pnb/service/db"
+	"database/sql"
+	"log/slog"
+
+	"github.com/pressly/goose/v3"
 )
+
+type Configurer interface {
+	ConnString() string
+	MigrationPath() string
+}
 
 // Service struct
 type Service struct {
-	db Database
-}
-
-// Database store interface
-type Database interface {
-	GetSource(ctx context.Context, id int32) (db.Source, error)
-	SelectSources(ctx context.Context) ([]db.Source, error)
-	InsertSource(ctx context.Context, arg db.InsertSourceParams) (db.Source, error)
-	UpdateSource(ctx context.Context, arg db.UpdateSourceParams) (db.Source, error)
-	DeleteSource(ctx context.Context, id int32) (db.Source, error)
-	InsertHealth(ctx context.Context, arg db.InsertHealthParams) (db.Health, error)
+	store Querier
 }
 
 // New returns new Service
-func New(d Database) Service {
-	return Service{
-		db: d,
+func NewService(c Configurer) (*Service, *sql.DB, error) {
+	slog.Info("Connecting to database...")
+	db, err := sql.Open("pgx", c.ConnString())
+	if err != nil {
+		slog.Error("Failed to connect to database", err)
+		return nil, nil, err
 	}
+
+	slog.Info("Pinging database...")
+	err = db.Ping()
+	if err != nil {
+		slog.Error("Failed to ping database", err)
+		return nil, nil, err
+	}
+
+	slog.Info("Running migrations...")
+	err = goose.Up(db, c.MigrationPath())
+	if err != nil {
+		slog.Error("Failed to run migrations", err)
+		return nil, nil, err
+	}
+
+	slog.Info("Creating store...")
+	store := New(db)
+	return &Service{
+		store: store,
+	}, db, nil
 }

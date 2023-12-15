@@ -3,11 +3,37 @@
 //   sqlc v1.24.0
 // source: sources.sql
 
-package db
+package service
 
 import (
 	"context"
 )
+
+const createSource = `-- name: CreateSource :one
+INSERT INTO sources (name, url, driver) 
+VALUES ($1, $2, $3)
+RETURNING id, name, url, driver, created_at, updated_at
+`
+
+type CreateSourceParams struct {
+	Name   string `json:"name"`
+	Url    string `json:"url"`
+	Driver string `json:"driver"`
+}
+
+func (q *Queries) CreateSource(ctx context.Context, arg CreateSourceParams) (Source, error) {
+	row := q.db.QueryRowContext(ctx, createSource, arg.Name, arg.Url, arg.Driver)
+	var i Source
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.Driver,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
 
 const deleteSource = `-- name: DeleteSource :one
 DELETE FROM 
@@ -50,39 +76,13 @@ func (q *Queries) GetSource(ctx context.Context, id int32) (Source, error) {
 	return i, err
 }
 
-const insertSource = `-- name: InsertSource :one
-INSERT INTO sources (name, url, driver) 
-VALUES ($1, $2, $3)
-RETURNING id, name, url, driver, created_at, updated_at
-`
-
-type InsertSourceParams struct {
-	Name   string
-	Url    string
-	Driver string
-}
-
-func (q *Queries) InsertSource(ctx context.Context, arg InsertSourceParams) (Source, error) {
-	row := q.db.QueryRowContext(ctx, insertSource, arg.Name, arg.Url, arg.Driver)
-	var i Source
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Url,
-		&i.Driver,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const selectSources = `-- name: SelectSources :many
+const listSources = `-- name: ListSources :many
 SELECT id, name, url, driver, created_at, updated_at 
 FROM sources
 `
 
-func (q *Queries) SelectSources(ctx context.Context) ([]Source, error) {
-	rows, err := q.db.QueryContext(ctx, selectSources)
+func (q *Queries) ListSources(ctx context.Context) ([]Source, error) {
+	rows, err := q.db.QueryContext(ctx, listSources)
 	if err != nil {
 		return nil, err
 	}
@@ -123,10 +123,10 @@ RETURNING id, name, url, driver, created_at, updated_at
 `
 
 type UpdateSourceParams struct {
-	ID     int32
-	Name   string
-	Url    string
-	Driver string
+	ID     int32  `json:"id"`
+	Name   string `json:"name"`
+	Url    string `json:"url"`
+	Driver string `json:"driver"`
 }
 
 func (q *Queries) UpdateSource(ctx context.Context, arg UpdateSourceParams) (Source, error) {
