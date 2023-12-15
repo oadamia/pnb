@@ -32,7 +32,6 @@ func (s Service) CreateSource(ctx context.Context, params CreateSourceParams) (*
 }
 
 func (s Service) UpdateSource(ctx context.Context, id int, params UpdateSourceParams) (*Source, error) {
-
 	source, err := s.store.UpdateSource(ctx, params)
 	if err != nil {
 		return nil, err

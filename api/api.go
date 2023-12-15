@@ -13,11 +13,13 @@ import (
 )
 
 var e *echo.Echo
+var s service.Service
 
-func Init(s service.Service, port string) {
+func Init(ser service.Service, port string) {
 	e = echo.New()
+	s = ser
 	addLogger()
-	registerRoutes(s)
+	registerRoutes()
 	start(port)
 }
 
@@ -49,15 +51,15 @@ func addLogger() {
 	}))
 }
 
-func registerRoutes(s service.Service) {
+func registerRoutes() {
 	group := e.Group("/pnb/v1")
-	group.GET("/healthcheck", HealthCheck(s))
+	group.GET("/healthcheck", HealthCheck)
 
-	group.GET("/sources", ListSources(s))
-	group.POST("/sources", CreateSource(s))
-	group.GET("/sources/:id", GetSource(s))
-	group.PUT("/sources/:id", UpdateSource(s))
-	group.DELETE("/sources/:id", DeleteSource(s))
+	group.GET("/sources", ListSources)
+	group.POST("/sources", CreateSource)
+	group.GET("/sources/:id", GetSource)
+	group.PUT("/sources/:id", UpdateSource)
+	group.DELETE("/sources/:id", DeleteSource)
 
 }
 
