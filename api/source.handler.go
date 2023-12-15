@@ -1,6 +1,8 @@
 package api
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 	"pnb/service"
 	"strconv"
@@ -22,7 +24,7 @@ func CreateSource(ctx echo.Context) error {
 	req := new(service.CreateSourceParams)
 	err := ctx.Bind(req)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	res, err := s.CreateSource(ctx.Request().Context(), *req)
@@ -37,9 +39,12 @@ func CreateSource(ctx echo.Context) error {
 func GetSource(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 	res, err := s.GetSource(ctx.Request().Context(), id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return echo.NewHTTPError(http.StatusNotFound, err)
+	}
 	if err != nil {
 		return err
 	}
@@ -50,16 +55,19 @@ func GetSource(ctx echo.Context) error {
 func UpdateSource(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	req := new(service.UpdateSourceParams)
 	err = ctx.Bind(req)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
 	res, err := s.UpdateSource(ctx.Request().Context(), id, *req)
+	if errors.Is(err, sql.ErrNoRows) {
+		return echo.NewHTTPError(http.StatusNotFound, err)
+	}
 	if err != nil {
 		return err
 	}
@@ -71,7 +79,7 @@ func UpdateSource(ctx echo.Context) error {
 func DeleteSource(ctx echo.Context) error {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 	res, err := s.DeleteSource(ctx.Request().Context(), id)
 	if err != nil {
