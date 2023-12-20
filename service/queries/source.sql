@@ -3,7 +3,7 @@ INSERT INTO source (id, name, url, description, category, language, country)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING *;
 
--- name: ListSources :many
+-- name: ListSource :many
 SELECT * 
 FROM source
 WHERE 

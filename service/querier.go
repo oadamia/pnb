@@ -13,7 +13,7 @@ type Querier interface {
 	CreateSource(ctx context.Context, arg CreateSourceParams) (Source, error)
 	DeleteSource(ctx context.Context, id string) (Source, error)
 	GetSource(ctx context.Context, id string) (Source, error)
-	ListSources(ctx context.Context, arg ListSourcesParams) ([]Source, error)
+	ListSource(ctx context.Context, arg ListSourceParams) ([]Source, error)
 	UpdateSource(ctx context.Context, arg UpdateSourceParams) (Source, error)
 }
 

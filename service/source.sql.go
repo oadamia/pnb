@@ -99,7 +99,7 @@ func (q *Queries) GetSource(ctx context.Context, id string) (Source, error) {
 	return i, err
 }
 
-const listSources = `-- name: ListSources :many
+const listSource = `-- name: ListSource :many
 SELECT name, url, created_at, updated_at, id, description, category, language, country 
 FROM source
 WHERE 
@@ -107,15 +107,15 @@ WHERE
     AND (NOT $3::boolean OR country = ANY($4::TEXT[]))
 `
 
-type ListSourcesParams struct {
+type ListSourceParams struct {
 	CategoriesSet bool     `json:"categories_set"`
 	Categories    []string `json:"categories"`
 	CountriesSet  bool     `json:"countries_set"`
 	Countries     []string `json:"countries"`
 }
 
-func (q *Queries) ListSources(ctx context.Context, arg ListSourcesParams) ([]Source, error) {
-	rows, err := q.db.QueryContext(ctx, listSources,
+func (q *Queries) ListSource(ctx context.Context, arg ListSourceParams) ([]Source, error) {
+	rows, err := q.db.QueryContext(ctx, listSource,
 		arg.CategoriesSet,
 		pq.Array(arg.Categories),
 		arg.CountriesSet,

@@ -13,8 +13,8 @@ func (s Service) GetSource(ctx context.Context, id string) (*Source, error) {
 	return &source, nil
 }
 
-func (s Service) ListSources(ctx context.Context, params ListSourcesParams) ([]Source, error) {
-	sources, err := s.store.ListSources(ctx, params)
+func (s Service) ListSources(ctx context.Context, params ListSourceParams) ([]Source, error) {
+	sources, err := s.store.ListSource(ctx, params)
 	if err != nil {
 		return nil, err
 	}
