@@ -31,10 +31,10 @@ func main() {
 	defer db.Close()
 
 	slog.Info("Creating worker...")
-	worker.New(*service)
+	worker.Init(service)
 
 	slog.Info("Init API")
-	api.Init(*service, cfg.Port)
+	api.Init(service, cfg.Port)
 }
 
 type Config struct {

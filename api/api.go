@@ -13,9 +13,9 @@ import (
 )
 
 var e *echo.Echo
-var s service.Service
+var s *service.Service
 
-func Init(ser service.Service, port string) {
+func Init(ser *service.Service, port string) {
 	e = echo.New()
 	s = ser
 	addLogger()
