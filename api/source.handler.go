@@ -12,7 +12,7 @@ import (
 
 // ListSources handler
 func ListSources(ctx echo.Context) error {
-	res, err := s.SelectSources(ctx.Request().Context())
+	res, err := s.ListSources(ctx.Request().Context())
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func CreateSource(ctx echo.Context) error {
 
 	res, err := s.CreateSource(ctx.Request().Context(), *req)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
 	return ctx.JSON(http.StatusOK, res)
@@ -46,7 +46,7 @@ func GetSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(http.StatusOK, res)
 }
@@ -69,7 +69,7 @@ func UpdateSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
 	return ctx.JSON(http.StatusOK, res)
@@ -83,7 +83,7 @@ func DeleteSource(ctx echo.Context) error {
 	}
 	res, err := s.DeleteSource(ctx.Request().Context(), id)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(http.StatusOK, res)
 }
