@@ -35,11 +35,15 @@ func Init(s *service.Service) error {
 
 func (w *Worker) start() error {
 
-	_, err := w.c.AddFunc("@every 1s", collectJob(w.service))
+	_, err := w.c.AddFunc("@every 1s", w.collectorJob)
 	if err != nil {
 		return err
 	}
 
 	w.c.Start()
 	return nil
+}
+
+func (w *Worker) collectorJob() {
+	slog.Info("Collecting...")
 }
