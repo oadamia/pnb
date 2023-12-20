@@ -55,7 +55,7 @@ func registerRoutes() {
 	group := e.Group("/pnb/v1")
 	group.GET("/healthcheck", HealthCheck)
 
-	group.GET("/sources", ListSources)
+	group.GET("/sources", ListSource)
 	group.POST("/sources", CreateSource)
 	group.GET("/sources/:id", GetSource)
 	group.PUT("/sources/:id", UpdateSource)

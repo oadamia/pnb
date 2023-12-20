@@ -15,10 +15,13 @@ type Health struct {
 }
 
 type Source struct {
-	ID        int32     `json:"id"`
-	Name      string    `json:"name"`
-	Url       string    `json:"url"`
-	Driver    string    `json:"driver"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Name        string    `json:"name"`
+	Url         string    `json:"url"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	ID          string    `json:"id"`
+	Description string    `json:"description"`
+	Category    string    `json:"category"`
+	Language    string    `json:"language"`
+	Country     string    `json:"country"`
 }

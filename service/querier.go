@@ -11,9 +11,9 @@ import (
 type Querier interface {
 	CreateHealth(ctx context.Context, arg CreateHealthParams) (Health, error)
 	CreateSource(ctx context.Context, arg CreateSourceParams) (Source, error)
-	DeleteSource(ctx context.Context, id int32) (Source, error)
-	GetSource(ctx context.Context, id int32) (Source, error)
-	ListSources(ctx context.Context) ([]Source, error)
+	DeleteSource(ctx context.Context, id string) (Source, error)
+	GetSource(ctx context.Context, id string) (Source, error)
+	ListSources(ctx context.Context, arg ListSourcesParams) ([]Source, error)
 	UpdateSource(ctx context.Context, arg UpdateSourceParams) (Source, error)
 }
 

@@ -5,14 +5,22 @@ import (
 	"errors"
 	"net/http"
 	"pnb/service"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-// ListSources handler
-func ListSources(ctx echo.Context) error {
-	res, err := s.ListSources(ctx.Request().Context())
+// ListSource handler
+func ListSource(ctx echo.Context) error {
+
+	var req ListSourceReq
+	err := ctx.Bind(&req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	listParams := listSourceParamsFrom(req)
+
+	res, err := s.ListSources(ctx.Request().Context(), listParams)
 	if err != nil {
 		return err
 	}
@@ -37,11 +45,7 @@ func CreateSource(ctx echo.Context) error {
 
 // GetSource handler
 func GetSource(ctx echo.Context) error {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
-	res, err := s.GetSource(ctx.Request().Context(), id)
+	res, err := s.GetSource(ctx.Request().Context(), ctx.Param("id"))
 	if errors.Is(err, sql.ErrNoRows) {
 		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
@@ -53,18 +57,14 @@ func GetSource(ctx echo.Context) error {
 
 // UpdateSource handler
 func UpdateSource(ctx echo.Context) error {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
 
 	req := new(service.UpdateSourceParams)
-	err = ctx.Bind(req)
+	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	res, err := s.UpdateSource(ctx.Request().Context(), id, *req)
+	res, err := s.UpdateSource(ctx.Request().Context(), ctx.Param("id"), *req)
 	if errors.Is(err, sql.ErrNoRows) {
 		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
@@ -77,11 +77,7 @@ func UpdateSource(ctx echo.Context) error {
 
 // DeleteSource handler
 func DeleteSource(ctx echo.Context) error {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
-	res, err := s.DeleteSource(ctx.Request().Context(), id)
+	res, err := s.DeleteSource(ctx.Request().Context(), ctx.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}

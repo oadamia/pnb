@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-func (s Service) GetSource(ctx context.Context, id int) (*Source, error) {
-	source, err := s.store.GetSource(ctx, int32(id))
+func (s Service) GetSource(ctx context.Context, id string) (*Source, error) {
+	source, err := s.store.GetSource(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13,8 +13,8 @@ func (s Service) GetSource(ctx context.Context, id int) (*Source, error) {
 	return &source, nil
 }
 
-func (s Service) ListSources(ctx context.Context) ([]Source, error) {
-	sources, err := s.store.ListSources(ctx)
+func (s Service) ListSources(ctx context.Context, params ListSourcesParams) ([]Source, error) {
+	sources, err := s.store.ListSources(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (s Service) CreateSource(ctx context.Context, params CreateSourceParams) (*
 	return &source, nil
 }
 
-func (s Service) UpdateSource(ctx context.Context, id int, params UpdateSourceParams) (*Source, error) {
+func (s Service) UpdateSource(ctx context.Context, id string, params UpdateSourceParams) (*Source, error) {
 	source, err := s.store.UpdateSource(ctx, params)
 	if err != nil {
 		return nil, err
@@ -40,8 +40,8 @@ func (s Service) UpdateSource(ctx context.Context, id int, params UpdateSourcePa
 	return &source, nil
 }
 
-func (s Service) DeleteSource(ctx context.Context, id int) (*Source, error) {
-	source, err := s.store.DeleteSource(ctx, int32(id))
+func (s Service) DeleteSource(ctx context.Context, id string) (*Source, error) {
+	source, err := s.store.DeleteSource(ctx, id)
 	if err != nil {
 		return nil, err
 	}
