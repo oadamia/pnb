@@ -63,6 +63,8 @@ func main() {
 type Config struct {
 	Port            string `envconfig:"port" required:"true"`
 	OpenAIKey       string `envconfig:"openai_api_key" required:"true"`
+	NewsAPIBaseURL  string `envconfig:"news_api_base_url" required:"true"`
+	NewsAPIKey      string `envconfig:"news_api_key" required:"true"`
 	DBAddress       string `envconfig:"db_address" required:"true"`
 	DBName          string `envconfig:"db_name" required:"true"`
 	DBUser          string `envconfig:"db_user" required:"true"`

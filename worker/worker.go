@@ -3,14 +3,16 @@ package worker
 import (
 	"log/slog"
 	"os"
+	"pnb/newsapi"
 	"pnb/service"
 
 	"github.com/robfig/cron/v3"
 )
 
 type Worker struct {
-	service *service.Service
-	c       *cron.Cron
+	service       *service.Service
+	cronClient    *cron.Cron
+	newsapiClient *newsapi.Client
 }
 
 func Init(s *service.Service) error {
@@ -23,8 +25,8 @@ func Init(s *service.Service) error {
 		cron.WithChain(recoveryWrapper))
 
 	w := &Worker{
-		service: s,
-		c:       c,
+		service:    s,
+		cronClient: c,
 	}
 
 	err := w.start()
@@ -35,12 +37,17 @@ func Init(s *service.Service) error {
 }
 
 func (w *Worker) start() error {
-	_, err := w.c.AddFunc("* * * * * *", w.collectorJob)
+	_, err := w.cronClient.AddFunc("0 0 * * * *", w.collectorJob)
 	if err != nil {
 		return err
 	}
 
-	w.c.Start()
+	_, err = w.cronClient.AddFunc("30 * * * * *", w.refreshSources)
+	if err != nil {
+		return err
+	}
+
+	w.cronClient.Start()
 	return nil
 }
 
