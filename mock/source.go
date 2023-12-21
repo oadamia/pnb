@@ -43,3 +43,41 @@ func ListSource() []store.Source {
 	}
 
 }
+
+func GetSource() store.Source {
+	return store.Source{
+		Name:        "Source4",
+		Url:         "http://source4.com",
+		CreatedAt:   time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+		UpdatedAt:   time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+		ID:          "4",
+		Description: "This is Source4",
+		Category:    "technology",
+		Language:    "en",
+		Country:     "US",
+	}
+}
+
+func CreateSourceParams() store.CreateSourceParams {
+	return store.CreateSourceParams{
+		ID:          "source4",
+		Name:        "Source4",
+		Url:         "http://source4.com",
+		Description: "This is Source4",
+		Category:    "technology",
+		Language:    "en",
+		Country:     "US",
+	}
+}
+
+func UpdateSourceParams() store.UpdateSourceParams {
+	return store.UpdateSourceParams{
+		ID:          "source4",
+		Name:        "Source4 Updated",
+		Url:         "http://source4updated.com",
+		Description: "This is Source4 Updated",
+		Category:    "technology",
+		Language:    "en",
+		Country:     "US",
+	}
+}

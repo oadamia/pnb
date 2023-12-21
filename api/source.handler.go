@@ -44,7 +44,7 @@ func CreateSource(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(http.StatusOK, res)
+	return ctx.JSON(http.StatusCreated, res)
 }
 
 // GetSource handler
