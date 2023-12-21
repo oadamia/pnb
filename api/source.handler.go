@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"pnb/service"
+	"pnb/service/store"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,12 +24,16 @@ func ListSource(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(http.StatusOK, res)
+
+	sources := make([]store.Source, len(res))
+	copy(res, sources)
+
+	return ctx.JSON(http.StatusOK, sources)
 }
 
 // CreateSource handler
 func CreateSource(ctx echo.Context) error {
-	req := new(service.CreateSourceParams)
+	req := new(store.CreateSourceParams)
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
@@ -58,7 +62,7 @@ func GetSource(ctx echo.Context) error {
 // UpdateSource handler
 func UpdateSource(ctx echo.Context) error {
 
-	req := new(service.UpdateSourceParams)
+	req := new(store.UpdateSourceParams)
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)

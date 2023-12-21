@@ -1,15 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"pnb/api"
 	"pnb/service"
+	"pnb/service/store"
 	"pnb/worker"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
@@ -22,16 +25,36 @@ func main() {
 		panic(err)
 	}
 
-	slog.Info("Creating service...")
-	service, db, err := service.NewService(cfg)
+	slog.Info("Connecting to database...")
+	db, err := sql.Open("pgx", cfg.ConnString())
 	if err != nil {
-		slog.Error("Failed to create service", err)
+		slog.Error("Failed to connect to database", err)
 		panic(err)
 	}
 	defer db.Close()
 
+	slog.Info("Pinging database...")
+	err = db.Ping()
+	if err != nil {
+		slog.Error("Failed to ping database", err)
+	}
+
+	slog.Info("Running migrations...")
+	err = goose.Up(db, cfg.MigrationPath())
+	if err != nil {
+		slog.Error("Failed to run migrations", err)
+		panic(err)
+	}
+
+	querier := store.New(db)
+	service := service.NewService(querier)
+
 	slog.Info("Creating worker...")
-	worker.Init(service)
+	err = worker.Init(service)
+	if err != nil {
+		slog.Error("Failed to create worker", err)
+		panic(err)
+	}
 
 	slog.Info("Init API")
 	api.Init(service, cfg.Port)

@@ -3,7 +3,7 @@
 //   sqlc v1.24.0
 // source: source.sql
 
-package service
+package store
 
 import (
 	"context"

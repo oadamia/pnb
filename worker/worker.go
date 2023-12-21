@@ -18,6 +18,7 @@ func Init(s *service.Service) error {
 	recoveryWrapper := cron.Recover(logWrapper)
 
 	c := cron.New(
+		cron.WithSeconds(),
 		cron.WithLogger(logWrapper),
 		cron.WithChain(recoveryWrapper))
 
@@ -34,8 +35,7 @@ func Init(s *service.Service) error {
 }
 
 func (w *Worker) start() error {
-
-	_, err := w.c.AddFunc("@every 1s", w.collectorJob)
+	_, err := w.c.AddFunc("* * * * * *", w.collectorJob)
 	if err != nil {
 		return err
 	}
