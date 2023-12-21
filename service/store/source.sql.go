@@ -105,6 +105,7 @@ FROM source
 WHERE 
     (NOT $1::boolean OR category = ANY($2::TEXT[]))
     AND (NOT $3::boolean OR country = ANY($4::TEXT[]))
+    AND (NOT $5::boolean OR language = ANY($6::TEXT[]))
 `
 
 type ListSourceParams struct {
@@ -112,6 +113,8 @@ type ListSourceParams struct {
 	Categories    []string `json:"categories"`
 	CountriesSet  bool     `json:"countries_set"`
 	Countries     []string `json:"countries"`
+	LanguagesSet  bool     `json:"languages_set"`
+	Languages     []string `json:"languages"`
 }
 
 func (q *Queries) ListSource(ctx context.Context, arg ListSourceParams) ([]Source, error) {
@@ -120,6 +123,8 @@ func (q *Queries) ListSource(ctx context.Context, arg ListSourceParams) ([]Sourc
 		pq.Array(arg.Categories),
 		arg.CountriesSet,
 		pq.Array(arg.Countries),
+		arg.LanguagesSet,
+		pq.Array(arg.Languages),
 	)
 	if err != nil {
 		return nil, err

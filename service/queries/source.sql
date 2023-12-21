@@ -8,7 +8,9 @@ SELECT *
 FROM source
 WHERE 
     (NOT @categories_set::boolean OR category = ANY(@categories::TEXT[]))
-    AND (NOT @countries_set::boolean OR country = ANY(@countries::TEXT[]));
+    AND (NOT @countries_set::boolean OR country = ANY(@countries::TEXT[]))
+    AND (NOT @languages_set::boolean OR language = ANY(@languages::TEXT[]));
+
 
 -- name: GetSource :one
 SELECT * 

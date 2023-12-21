@@ -26,7 +26,7 @@ func ListSource(ctx echo.Context) error {
 	}
 
 	sources := make([]store.Source, len(res))
-	copy(res, sources)
+	copy(sources, res)
 
 	return ctx.JSON(http.StatusOK, sources)
 }

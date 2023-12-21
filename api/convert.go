@@ -10,5 +10,7 @@ func listSourceParamsFrom(req ListSourceReq) store.ListSourceParams {
 		Categories:    req.Categories,
 		CountriesSet:  len(req.Countries) > 0,
 		Countries:     req.Countries,
+		LanguagesSet:  len(req.Languages) > 0,
+		Languages:     req.Languages,
 	}
 }

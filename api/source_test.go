@@ -1,8 +1,10 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"pnb/mock"
 	"pnb/service"
 	"pnb/service/store"
 	"testing"
@@ -15,25 +17,33 @@ import (
 func TestSources(t *testing.T) {
 	e = echo.New()
 	ctrl := gomock.NewController(t)
-	querier := store.NewMockQuerier(ctrl)
-	s = service.NewService(querier)
+	mockQuerier := store.NewMockQuerier(ctrl)
+	s = service.NewService(mockQuerier)
 
 	t.Run("ListSources", func(t *testing.T) {
-		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, listSourcePath, nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		ctx := e.NewContext(req, rec)
+		listQueryParams := "?category=general&category=sport&language=ge&country=ge"
 
-		querier.
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, listSourcePath+listQueryParams, nil)
+		ctx := e.NewContext(req, rec)
+		exp := mock.ListSource()
+
+		mockQuerier.
 			EXPECT().
 			ListSource(ctx.Request().Context(), gomock.Any()).
-			Return([]store.Source{}, nil)
+			Return(exp, nil)
 
 		assert := assert.New(t)
 		if assert.NoError(ListSource(ctx)) {
-			assert.Equal(http.StatusOK, rec.Code)
-		}
+			var actual []store.Source
+			err := json.Unmarshal(rec.Body.Bytes(), &actual)
+			if err != nil {
+				t.Fatal(err)
+			}
 
+			assert.Equal(http.StatusOK, rec.Code)
+			assert.Equal(exp, actual)
+		}
 	})
 
 	t.Run("CreateSource", func(t *testing.T) {
